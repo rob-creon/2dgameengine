@@ -1,0 +1,15 @@
+package com.creon.engine.test.input;
+
+import org.joml.Vector2f;
+
+public class InputAxis {
+
+	private String name;
+
+	private Vector2f axis;
+
+	public InputAxis(String name, int keyUp, int keyDown, int keyLeft, int keyRight) {
+		this.name = name;
+		axis = new Vector2f();
+	}
+}

@@ -1,0 +1,9 @@
+package com.creon.engine.test.util;
+
+import java.io.File;
+
+public class IO {
+	public static String loadFile(String path) {
+		File f = new File(path);
+	}
+}

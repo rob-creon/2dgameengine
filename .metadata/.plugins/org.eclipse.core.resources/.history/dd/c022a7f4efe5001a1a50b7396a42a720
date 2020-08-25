@@ -1,0 +1,12 @@
+package com.creon.engine.test.util;
+
+import java.io.InputStream;
+import java.io.StringWriter;
+
+public class IO {
+	public static String loadFile(String path) {
+		InputStream stream = ClassLoader.getSystemResourceAsStream(path);
+		StringWriter writer = new StringWriter();
+		
+	}
+}

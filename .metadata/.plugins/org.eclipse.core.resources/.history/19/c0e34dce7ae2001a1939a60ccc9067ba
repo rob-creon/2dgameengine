@@ -1,0 +1,21 @@
+package com.creon.engine.test.window;
+
+public abstract class GameWindow {
+
+	public interface GameWindowListener {
+		public void requestClose();
+	}
+
+	protected String name;
+	protected int width, height;
+	protected GameWindowListener listener;
+
+	protected GameWindow(String name, int width, int height, GameWindowListener listener) {
+		this.name = name;
+		this.width = width;
+		this.height = height;
+		this.listener = listener;
+	}
+	
+	public abstract void loopTick();
+}

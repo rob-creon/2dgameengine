@@ -1,0 +1,21 @@
+package com.creon.engine.test.util;
+
+import java.io.InputStream;
+import java.util.Scanner;
+
+public class IO {
+	public static String loadFile(String path) {
+		InputStream stream = ClassLoader.getSystemResourceAsStream(path);
+
+		try {
+			Scanner s = new Scanner(stream).useDelimiter("\\A");
+
+			String result = s.hasNext() ? s.next() : "";
+			return result;
+		} catch (Exception ex) {
+			System.err.println("Error loading file '" + path + "'.");
+			return null;
+		}
+
+	}
+}

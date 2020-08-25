@@ -1,0 +1,93 @@
+package com.creon.engine.test.game;
+
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.opengl.GL11.glClearColor;
+
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.opengl.GL;
+
+import com.creon.engine.test.input.Input;
+import com.creon.engine.test.window.GameWindow;
+import com.creon.engine.test.window.GameWindow.GameWindowListener;
+import com.creon.engine.test.window.WindowGLFW;
+
+public class Game implements GameWindowListener {
+
+	private boolean running = false;
+
+	private GameWindow window;
+
+	public Game() {
+		initGLFW();
+		window = new WindowGLFW("EngineTest", 500, 500, this);
+
+		initGL();
+	}
+
+	private void initGLFW() {
+		GLFWErrorCallback.createPrint(System.err).set();
+		if (!glfwInit())
+			throw new IllegalStateException("Unable to initialize GLFW");
+	}
+
+	private void initGL() {
+		GL.createCapabilities();
+
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	private void destroy() {
+		window.destroy();
+
+		glfwTerminate();
+		glfwSetErrorCallback(null).free();
+	}
+
+	public void start() {
+		running = true;
+		loop();
+	}
+
+	public void stop() {
+		running = false;
+		destroy();
+	}
+
+	private void loop() {
+
+		long lastFrameTime = System.nanoTime();
+		int frames = 0;
+		while (running) {
+			window.loopTick();
+			Input.getInstance().tick();
+
+			if (Input.getInstance().getBtnEscape().isTapped()) {
+				stop();
+			}
+
+			frames++;
+
+			if (System.nanoTime() - lastFrameTime > 1e+9) { // 1e+9 = # of nano seconds in a second
+				System.out.println("FPS: " + frames);
+				frames = 0;
+				lastFrameTime = System.nanoTime();
+			}
+		}
+		
+		destroy();
+	}
+
+	@Override
+	public void requestClose() {
+		System.out.println("Window Requested close.");
+		this.stop();
+	}
+
+	@Override
+	public void keyEvent(int key, int action, int mods) {
+
+	}
+
+}

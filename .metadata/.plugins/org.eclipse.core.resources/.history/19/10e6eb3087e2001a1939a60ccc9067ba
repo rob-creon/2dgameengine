@@ -1,0 +1,41 @@
+package com.creon.engine.test.input;
+
+public class InputButton {
+
+	private String dbgName;
+	private boolean isPressed, isTapped, isReleased, isHeld;
+
+	public InputButton(String dbgName) {
+		isPressed = false;
+		isTapped = false;
+		isReleased = false;
+		isHeld = false;
+	}
+	
+	public void 
+
+	public String toString() {
+		return "InputButton{name=\"" + dbgName + "\"}";
+	}
+
+	public String getDbgName() {
+		return dbgName;
+	}
+
+	public boolean isPressed() {
+		return isPressed;
+	}
+
+	public boolean isTapped() {
+		return isTapped;
+	}
+
+	public boolean isReleased() {
+		return isReleased;
+	}
+
+	public boolean isHeld() {
+		return isHeld;
+	}
+
+}

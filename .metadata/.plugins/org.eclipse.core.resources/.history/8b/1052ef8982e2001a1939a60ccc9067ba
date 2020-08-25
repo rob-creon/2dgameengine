@@ -1,0 +1,11 @@
+package com.creon.engine.test.input;
+
+public class InputVirtualJoystick {
+
+	private float x, y;
+
+	public InputVirtualJoystick() {
+		x = 0f;
+		y = 0f;
+	}
+}

@@ -1,0 +1,8 @@
+
+public class Renderer {
+	
+	public interface APIRenderer {
+		
+	}
+
+}

@@ -1,0 +1,10 @@
+package com.creon.engine.test.input;
+
+public class InputAxis {
+
+	private Vector2f axis;
+
+	public InputAxis() {
+
+	}
+}

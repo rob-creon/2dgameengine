@@ -1,0 +1,11 @@
+package com.creon.engine.test.util;
+
+import java.io.File;
+import java.nio.file.Files;
+
+public class IO {
+	public static String loadFile(String path) {
+		File f = new File(path);
+		return Files.lines(path).forEach();
+	}
+}

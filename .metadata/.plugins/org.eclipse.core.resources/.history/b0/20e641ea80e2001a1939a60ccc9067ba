@@ -1,0 +1,5 @@
+package com.creon.engine.test.window;
+
+public class InputListener {
+
+}

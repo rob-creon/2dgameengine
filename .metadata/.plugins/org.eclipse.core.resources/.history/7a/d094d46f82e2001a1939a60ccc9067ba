@@ -1,0 +1,5 @@
+package com.creon.engine.test.input;
+
+public class InputVirtualJoystick {
+	
+}

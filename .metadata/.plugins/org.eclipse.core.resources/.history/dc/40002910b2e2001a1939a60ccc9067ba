@@ -1,0 +1,12 @@
+package com.creon.engine.test.input;
+
+import org.joml.Vector2f;
+
+public class InputAxis {
+
+	private Vector2f axis;
+
+	public InputAxis() {
+		axis = new Vector2f();
+	}
+}

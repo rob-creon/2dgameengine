@@ -1,0 +1,20 @@
+package com.creon.engine.test.util;
+
+import java.io.InputStream;
+import java.io.StringWriter;
+
+public class IO {
+	public static String loadFile(String path) {
+		InputStream stream = ClassLoader.getSystemResourceAsStream(path);
+		
+		BufferedInputStream bis = new BufferedInputStream(inputStream);
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		int result = bis.read();
+		while(result != -1) {
+		    buf.write((byte) result);
+		    result = bis.read();
+		}
+		// StandardCharsets.UTF_8.name() > JDK 7
+		return buf.toString("UTF-8");
+	}
+}

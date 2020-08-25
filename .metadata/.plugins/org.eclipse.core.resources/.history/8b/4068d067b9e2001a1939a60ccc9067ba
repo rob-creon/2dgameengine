@@ -1,0 +1,9 @@
+package com.creon.engine.test.render;
+
+public class MasterRenderer {
+
+	private MasterRenderer() {
+	}
+
+	public static MasterRenderer getInstance()={return instance;}
+}

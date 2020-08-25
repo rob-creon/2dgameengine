@@ -1,0 +1,11 @@
+package com.creon.engine.test.util;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class IO {
+	public static String loadFile(String path) {
+		ClassLoader.getSystemResourceAsStream("config.xml");
+	}
+}

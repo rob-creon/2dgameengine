@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="Renderer.APIRenderer"/>
+    <fullyQualifiedTypeName name="org.lwjgl.glfw.GLFWKeyCallbackI"/>
+    <fullyQualifiedTypeName name="org.lwjgl.glfw.GLFWKeyCallback"/>
+    <fullyQualifiedTypeName name="org.joml.Vector2f"/>
+    <fullyQualifiedTypeName name="com.creon.engine.test.input.InputButton"/>
+    <fullyQualifiedTypeName name="com.creon.engine.test.input.InputButton.KeyAction"/>
+    <fullyQualifiedTypeName name="com.creon.engine.test.input.Input"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="org.lwjgl.glfw.GLFW"/>
+    <fullyQualifiedTypeName name="org.lwjgl.system.MemoryStack"/>
+    <fullyQualifiedTypeName name="java.nio.file.Files"/>
+    <fullyQualifiedTypeName name="com.creon.engine.test.util.IO"/>
+    <fullyQualifiedTypeName name="java.io.InputStream"/>
+    <fullyQualifiedTypeName name="org.joml.Matrix4f"/>
+    <fullyQualifiedTypeName name="org.lwjgl.BufferUtils"/>
+</qualifiedTypeNameHistroy>

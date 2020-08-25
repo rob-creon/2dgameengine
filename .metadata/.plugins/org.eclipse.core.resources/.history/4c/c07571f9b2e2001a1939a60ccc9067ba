@@ -1,0 +1,45 @@
+package com.creon.engine.test.input;
+
+import org.joml.Vector2f;
+
+public class InputAxis {
+
+	private String name;
+	private int keyUp, keyDown, keyLeft, keyRight;
+
+	private Vector2f axis;
+
+	public InputAxis(String name, int keyUp, int keyDown, int keyLeft, int keyRight) {
+		this.name = name;
+		this.keyUp = keyUp;
+		this.keyDown = keyDown;
+		this.keyLeft = keyLeft;
+		this.keyRight = keyRight;
+
+		axis = new Vector2f();
+	}
+
+	public boolean containsKey(int keyCode) {
+		return (keyUp == keyCode || keyDown == keyCode || keyLeft == keyCode || keyRight == keyCode);
+	}
+
+	public void tick() {
+		axis.x = 0.0f;
+		axis.y = 0.0f;
+	}
+
+	public void handleKey(int keyCode) {
+		if (keyCode == keyUp) {
+			axis.y += 1.0f;
+		}
+		if (keyCode == keyDown) {
+			axis.y -= 1.0f;
+		}
+		if (keyCode == keyRight) {
+			axis.x += 1.0f;
+		}
+		if (keyCode == keyLeft) {
+			axis.x -= 1.0f;
+		}
+	}
+}

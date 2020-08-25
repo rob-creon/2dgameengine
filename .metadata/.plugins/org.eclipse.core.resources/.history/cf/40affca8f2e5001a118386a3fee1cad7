@@ -1,0 +1,121 @@
+package com.creon.engine.test.render;
+
+import java.nio.FloatBuffer;
+
+import com.creon.engine.test.util.IO;
+
+import org.lwjgl.system.MemoryStack;
+
+import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL14.GL_FRAGMENT_DEPTH;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glGetAttribLocation;
+import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
+import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+
+public class TestRender {
+
+	public TestRender() {
+		init();
+	}
+
+	int vao;
+	int vbo;
+	int vertexShader;
+	int fragmentShader;
+	int shaderProgram;
+
+	private void init() {
+		vao = glGenVertexArrays();
+		glBindVertexArray(vao);
+
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			FloatBuffer vertices = stack.mallocFloat(3 * 6);
+			vertices.put(-0.6f).put(-0.4f).put(0f).put(1f).put(0f).put(0f);
+			vertices.put(0.6f).put(-0.4f).put(0f).put(0f).put(1f).put(0f);
+			vertices.put(0f).put(0.6f).put(0f).put(0f).put(0f).put(1f);
+			vertices.flip();
+
+			int vbo = glGenBuffers();
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+		} // stack is automatically popped, buffers are freed. this happens because
+			// MemoryStack implements AutoClosable, so java's try-with-resources auto calls
+			// stackPop() for us.
+
+		vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexShader, IO.loadFile("vertexShader.glsl"));
+		glCompileShader(vertexShader);
+
+		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentShader, IO.loadFile("fragmentShader.glsl"));
+		glCompileShader(fragmentShader);
+
+		if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) != GL_TRUE) {
+			throw new RuntimeException(glGetShaderInfoLog(vertexShader));
+		}
+
+		if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) != GL_TRUE) {
+			throw new RuntimeException(glGetShaderInfoLog(fragmentShader));
+		}
+
+		shaderProgram = glCreateProgram();
+		glAttachShader(shaderProgram, vertexShader);
+		glAttachShader(shaderProgram, fragmentShader);
+		glBindFragDataLocation(shaderProgram, 0, "fragColor");
+		glLinkProgram(shaderProgram);
+
+		if (glGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
+			throw new RuntimeException(glGetProgramInfoLog(shaderProgram));
+		}
+
+		glUseProgram(shaderProgram);
+
+		int floatSize = 4;
+
+		int posAttrib = glGetAttribLocation(shaderProgram, "position");
+		glEnableVertexAttribArray(posAttrib);
+		glVertexAttribPointer(posAttrib,
+				3,						// size per vertex 
+				GL_FLOAT, 				// type
+				false, 					// 
+				6 * floatSize, 
+				0);
+
+		int colAttrib = glGetAttribLocation(shaderProgram, "color");
+		glEnableVertexAttribArray(colAttrib);
+		glVertexAttribPointer(colAttrib, 3, GL_FLOAT, false, 6 * floatSize, 3 * floatSize);
+	}
+
+	public void render() {
+
+	}
+
+}

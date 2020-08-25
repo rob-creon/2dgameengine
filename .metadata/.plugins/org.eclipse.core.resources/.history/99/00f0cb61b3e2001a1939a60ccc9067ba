@@ -1,0 +1,72 @@
+package com.creon.engine.test.input;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+
+public class Input {
+
+	private static final Input instance = new Input();
+
+	public static Input getInstance() {
+		return Input.instance;
+	}
+
+	private InputButton btnEscape;
+	private InputButton btn1;
+
+	private InputAxis movementAxis;
+
+	private Input() {
+		movementAxis = new InputAxis("movementAxis", GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D);
+		btn1 = new InputButton("btn1");
+	}
+
+	public void tick() {
+		btn1.tick();
+	}
+
+	public InputAxis getMovementAxis() {
+		return movementAxis;
+	}
+
+	public InputButton getBtn1() {
+		return btn1;
+	}
+
+	public void handleGLFWKeyEvent(int key, int scancode, int action, int mods) {
+		// TODO keybindings system
+		// SEE https://www.glfw.org/docs/latest/group__keys.html
+
+		InputButton whichBtn = null;
+
+		if (key == GLFW_KEY_SPACE) {
+			whichBtn = btn1;
+		}
+		if (key == GLFW_KEY_ESCAPE) {
+			whichBtn = btnEscape;
+		}
+
+		if (whichBtn != null) {
+			switch (action) {
+			case 0:
+				whichBtn.callbackInvoke(InputButton.KeyAction.RELEASED);
+				break;
+			case 1:
+				whichBtn.callbackInvoke(InputButton.KeyAction.PRESSED);
+				break;
+			case 2:
+				whichBtn.callbackInvoke(InputButton.KeyAction.HELD);
+				break;
+			default:
+				System.err.println("Unknown GLFWKeyCallback action: " + action);
+				break;
+			}
+		}
+	}
+
+// public void addInputDevice(GameInputListener lis)
+}
