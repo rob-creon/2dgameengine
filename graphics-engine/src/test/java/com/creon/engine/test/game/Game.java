@@ -27,6 +27,8 @@ public class Game implements GameWindowListener {
 		return instance;
 	}
 
+	private double delta;
+
 	private boolean running = false;
 
 	private GameWindow window;
@@ -68,16 +70,17 @@ public class Game implements GameWindowListener {
 
 	public void stop() {
 		running = false;
-		// destroy();
 	}
 
 	private void loop() {
 
+		long lastSecFrameTime = System.nanoTime();
 		long lastFrameTime = System.nanoTime();
 		int frames = 0;
 		while (running) {
 
 			window.loopTick();
+			render.render();
 
 			// do game tick
 
@@ -86,14 +89,16 @@ public class Game implements GameWindowListener {
 				continue;
 			}
 
+			delta = (System.nanoTime() - lastFrameTime) / 1e+9d;
+			lastFrameTime = System.nanoTime();
 			Input.getInstance().tick();
-			render.render();
+			
 
 			frames++;
-			if (System.nanoTime() - lastFrameTime > 1e+9) { // 1e+9 = # of nano seconds in a second
+			if (System.nanoTime() - lastSecFrameTime > 1e+9) { // 1e+9 = # of nano seconds in a second
 				window.updateWindowName(WINDOW_TITLE + " FPS: " + frames);
 				frames = 0;
-				lastFrameTime = System.nanoTime();
+				lastSecFrameTime = System.nanoTime();
 			}
 		}
 
@@ -105,9 +110,8 @@ public class Game implements GameWindowListener {
 		this.stop();
 	}
 
-	@Override
-	public void keyEvent(int key, int action, int mods) {
-
+	public double getDelta() {
+		return delta;
 	}
 
 }

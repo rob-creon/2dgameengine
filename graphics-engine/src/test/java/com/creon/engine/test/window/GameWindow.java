@@ -4,7 +4,6 @@ public abstract class GameWindow {
 
 	public interface GameWindowListener {
 		public void requestClose();
-		public void keyEvent(int key, int action, int mods);
 	}
 
 	protected String name;

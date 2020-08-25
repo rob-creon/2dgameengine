@@ -49,8 +49,11 @@ public class Input {
 		// TODO keybindings system
 		// SEE https://www.glfw.org/docs/latest/group__keys.html
 
+		
+		
 		InputButton whichBtn = null;
 		if (key == GLFW_KEY_Z) {
+			
 			whichBtn = btn1;
 		}
 		if (key == GLFW_KEY_SPACE) {

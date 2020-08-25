@@ -4,6 +4,8 @@ import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
 
+import com.creon.engine.test.game.Game;
+import com.creon.engine.test.input.Input;
 import com.creon.engine.test.util.IO;
 
 import org.lwjgl.BufferUtils;
@@ -145,12 +147,21 @@ public class TestRender {
 		Matrix4f projection = new Matrix4f().ortho(-1.0f, 1.0f, -1f, 1f, -1f, 1f);
 		glUniformMatrix4fv(uniProjection, false, projection.get(BufferUtils.createFloatBuffer(16)));
 	}
+	
+	float angle = 0.0f;
 
 	public void render() {
+		
+		angle += Game.getInstance().getDelta() * 90f;
+
+		int uniModel = glGetUniformLocation(shaderProgram, "model");
+		Matrix4f model = new Matrix4f().rotate((float)Math.toRadians(angle), 0f, 0f, 1f);
+		glUniformMatrix4fv(uniModel, false, model.get(BufferUtils.createFloatBuffer(16)));
+
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
-	
+
 	public void destroy() {
 		glDeleteVertexArrays(vao);
 		glDeleteBuffers(vbo);
