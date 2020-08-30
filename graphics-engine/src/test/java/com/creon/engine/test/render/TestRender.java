@@ -1,54 +1,51 @@
 package com.creon.engine.test.render;
 
+import java.io.File;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import org.joml.Matrix4f;
 
 import com.creon.engine.test.game.Game;
-import com.creon.engine.test.input.Input;
-import com.creon.engine.test.util.IO;
+import com.creon.engine.test.render.shader.BasicShader;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
+import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_RGBA8;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL14.GL_FRAGMENT_DEPTH;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glGetError;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_BASE_LEVEL;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
+import static org.lwjgl.opengl.GL13.GL_CLAMP_TO_BORDER;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glAttachShader;
-import static org.lwjgl.opengl.GL20.glCompileShader;
-import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glCreateShader;
-import static org.lwjgl.opengl.GL20.glDeleteProgram;
-import static org.lwjgl.opengl.GL20.glDeleteShader;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glGetAttribLocation;
-import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
-import static org.lwjgl.opengl.GL20.glGetProgrami;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20.glGetShaderi;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glLinkProgram;
-import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUseProgram;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
@@ -61,113 +58,107 @@ public class TestRender {
 
 	int vao;
 	int vbo;
-	int vertexShader;
-	int fragmentShader;
-	int shaderProgram;
+	int ebo;
+	int texture;
+
+	BasicShader shader;
 
 	private void init() {
+
+		ByteBuffer image;
+		int imageWidth, imageHeight;
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer w = stack.mallocInt(1);
+			IntBuffer h = stack.mallocInt(1);
+			IntBuffer comp = stack.mallocInt(1);
+
+			STBImage.stbi_set_flip_vertically_on_load(true);
+			String absolutePath = TestRender.class.getClassLoader().getResource("smile.png").getPath().substring(1);
+			if (!System.getProperty("os.name").contains("Windows")) {
+				absolutePath = File.separator + absolutePath;
+			}
+			image = STBImage.stbi_load(absolutePath, w, h, comp, 4);
+			if (image == null)
+				throw new RuntimeException(
+						"Failed to load a texture file!" + System.lineSeparator() + STBImage.stbi_failure_reason());
+
+			imageWidth = w.get();
+			imageHeight = h.get();
+		}
+
+		texture = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 
+		float x1 = (1f - imageWidth) / 2f;
+		float y1 = (1f - imageHeight) / 2f;
+		float x2 = x1 + imageWidth;
+		float y2 = y1 + imageHeight;
+
 		try (MemoryStack stack = MemoryStack.stackPush()) {
-			FloatBuffer vertices = stack.mallocFloat(3 * 6);
-			vertices.put(-0.6f).put(-0.4f).put(0f).put(1f).put(0f).put(0f);
-			vertices.put(0.6f).put(-0.4f).put(0f).put(0f).put(1f).put(0f);
-			vertices.put(0f).put(0.6f).put(0f).put(0f).put(0f).put(1f);
+			FloatBuffer vertices = stack.mallocFloat(4 * 7);
+			vertices.put(x1).put(y1).put(1f).put(1f).put(1f).put(0f).put(0f);
+			vertices.put(x2).put(y1).put(1f).put(1f).put(1f).put(1f).put(0f);
+			vertices.put(x2).put(y2).put(1f).put(1f).put(1f).put(1f).put(1f);
+			vertices.put(x1).put(y2).put(1f).put(1f).put(1f).put(0f).put(1f);
 			vertices.flip();
 
-			int vbo = glGenBuffers();
+			vbo = glGenBuffers();
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-		} // stack is automatically popped, buffers are freed. this happens because
-			// MemoryStack implements AutoClosable, so java's try-with-resources auto calls
-			// stackPop() for us.
 
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, IO.loadFile("vertexShader.glsl"));
-		glCompileShader(vertexShader);
+			IntBuffer elements = stack.mallocInt(2 * 3);
+			elements.put(0).put(1).put(2);
+			elements.put(2).put(3).put(0);
+			elements.flip();
 
-		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, IO.loadFile("fragmentShader.glsl"));
-		glCompileShader(fragmentShader);
+			ebo = glGenBuffers();
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
 
-		if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) != GL_TRUE) {
-			throw new RuntimeException(glGetShaderInfoLog(vertexShader));
 		}
 
-		if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) != GL_TRUE) {
-			throw new RuntimeException(glGetShaderInfoLog(fragmentShader));
-		}
+		shader = new BasicShader();
 
-		shaderProgram = glCreateProgram();
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-		glBindFragDataLocation(shaderProgram, 0, "fragColor");
-		glLinkProgram(shaderProgram);
-
-		if (glGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
-			throw new RuntimeException(glGetProgramInfoLog(shaderProgram));
-		}
-
-		glUseProgram(shaderProgram);
-
-		int floatSize = 4;
-
-		// Because 2 attribs are being passed, each with 3 floats
-		// stride is the size (in bytes) per vertex
-		// offset is used inside the stride to seperate attribs
-
-		int posAttrib = glGetAttribLocation(shaderProgram, "position");
-		glEnableVertexAttribArray(posAttrib);
-		glVertexAttribPointer(posAttrib, 3, // size per vertex
-				GL_FLOAT, // type
-				false, // normalize?
-				6 * floatSize, // stride
-				0 // offset
-		);
-
-		int colAttrib = glGetAttribLocation(shaderProgram, "color");
-		glEnableVertexAttribArray(colAttrib);
-		glVertexAttribPointer(colAttrib, 3, // size per vertex
-				GL_FLOAT, // type
-				false, // normalize?
-				6 * floatSize, // stride
-				3 * floatSize // offset
-		);
-
-		int uniModel = glGetUniformLocation(shaderProgram, "model");
-		Matrix4f model = new Matrix4f();
-		glUniformMatrix4fv(uniModel, false, model.get(BufferUtils.createFloatBuffer(16)));
-
-		int uniView = glGetUniformLocation(shaderProgram, "view");
-		Matrix4f view = new Matrix4f();
-		glUniformMatrix4fv(uniView, false, view.get(BufferUtils.createFloatBuffer(16)));
-
-		int uniProjection = glGetUniformLocation(shaderProgram, "projection");
-		Matrix4f projection = new Matrix4f().ortho(-1.0f, 1.0f, -1f, 1f, -1f, 1f);
-		glUniformMatrix4fv(uniProjection, false, projection.get(BufferUtils.createFloatBuffer(16)));
 	}
-	
+
 	float angle = 0.0f;
 
 	public void render() {
-		
-		angle += Game.getInstance().getDelta() * 90f;
-
-		int uniModel = glGetUniformLocation(shaderProgram, "model");
-		Matrix4f model = new Matrix4f().rotate((float)Math.toRadians(angle), 0f, 0f, 1f);
-		glUniformMatrix4fv(uniModel, false, model.get(BufferUtils.createFloatBuffer(16)));
 
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		angle += Game.getInstance().getDelta() * 90f;
+		Matrix4f model = new Matrix4f().rotate((float) Math.toRadians(angle), 0f, 0f, 1f);
+
+		glBindVertexArray(vao);
+
+		glBindTexture(GL_TEXTURE_2D, texture);
+		shader.useProgram();
+
+		shader.setModelMatrix(model);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 	}
 
 	public void destroy() {
+		shader.destroy();
 		glDeleteVertexArrays(vao);
 		glDeleteBuffers(vbo);
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-		glDeleteProgram(shaderProgram);
+
 	}
 
 }

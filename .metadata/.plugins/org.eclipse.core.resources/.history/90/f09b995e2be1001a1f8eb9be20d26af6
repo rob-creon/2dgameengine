@@ -1,5 +1,0 @@
-package com.creon.engine.test;
-
-public class GLRenderer implements Renderer.APIRenderer{
-
-}

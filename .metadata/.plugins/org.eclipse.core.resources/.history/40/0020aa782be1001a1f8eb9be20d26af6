@@ -1,5 +1,0 @@
-package com.creon.engine.test.window;
-
-public abstract class GameWindow {
-	protected GameWindow
-}

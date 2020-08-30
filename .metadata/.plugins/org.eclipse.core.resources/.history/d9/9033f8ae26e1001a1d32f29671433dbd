@@ -1,7 +1,0 @@
-package com.creon.engine.test;
-
-public class Test {
-	public static void main(String[] args) {
-		new Game().run();
-	}
-}
