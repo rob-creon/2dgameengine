@@ -1,11 +1,11 @@
 # Eclipse
 .classpath
 .project
-.settings/
+graphics-engine/.settings/
 .metadata/
 
 # Intellij
-.idea/
+graphics-engine/.idea/
 *.iml
 *.iws
 
@@ -13,5 +13,5 @@
 .DS_Store
 
 # Maven
-log/
-target/
+graphics-engine/log/
+graphics-engine/target/
