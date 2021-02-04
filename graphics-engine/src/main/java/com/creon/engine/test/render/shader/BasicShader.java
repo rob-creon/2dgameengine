@@ -2,16 +2,6 @@ package com.creon.engine.test.render.shader;
 
 import org.joml.Matrix4f;
 
-import org.lwjgl.BufferUtils;
-
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glGetAttribLocation;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-
 public class BasicShader extends Shader {
 
 	private ShaderAttrib posAttrib, colAttrib, texAttrib;

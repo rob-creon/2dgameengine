@@ -7,7 +7,6 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GLUtil;
 
 import com.creon.engine.test.input.Input;
 import com.creon.engine.test.render.TestRender;
