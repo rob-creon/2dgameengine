@@ -158,7 +158,5 @@ public class TestRender {
 		shader.destroy();
 		glDeleteVertexArrays(vao);
 		glDeleteBuffers(vbo);
-
 	}
-
 }

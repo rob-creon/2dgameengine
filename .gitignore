@@ -17,3 +17,5 @@ graphics-engine/log
 graphics-engine/target
 
 */target/*
+
+.vscode
