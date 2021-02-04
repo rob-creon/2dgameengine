@@ -8,7 +8,7 @@ public abstract class Scene {
     private ArrayList<Entity> entities;
     
     public Scene() {
-
+        entities = new ArrayList<Entity>();
     }
 
     private void update() {
