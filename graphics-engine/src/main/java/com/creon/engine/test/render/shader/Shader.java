@@ -84,10 +84,7 @@ public abstract class Shader {
 		
 		initAttribs();
 
-		
-		
 		this.declareUniforms();
-		
 	}
 
 	private void initAttribs() {
